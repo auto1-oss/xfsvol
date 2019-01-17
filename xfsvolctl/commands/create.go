@@ -1,7 +1,7 @@
 package commands
 
 import (
-	"github.com/cirocosta/xfsvol/manager"
+	"github.com/auto1-oss/xfsvol/manager"
 	"github.com/pkg/errors"
 	"gopkg.in/urfave/cli.v1"
 )

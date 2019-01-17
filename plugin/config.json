@@ -1,6 +1,6 @@
 {
     "Description": "Docker plugin to manage XFS-mounted volumes",
-    "Documentation": "https://github.com/cirocosta/xfsvol",
+    "Documentation": "https://github.com/auto1-oss/xfsvol",
     "Entrypoint": [
         "/xfsvol"
     ],

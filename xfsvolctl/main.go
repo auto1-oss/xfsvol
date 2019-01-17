@@ -3,12 +3,12 @@ package main
 import (
 	"os"
 
-	"github.com/cirocosta/xfsvol/xfsvolctl/commands"
+	"github.com/auto1-oss/xfsvol/xfsvolctl/commands"
 	"gopkg.in/urfave/cli.v1"
 )
 
 var (
-	version string = "v1.0.2"
+	version string = "1.0.4"
 )
 
 func main() {

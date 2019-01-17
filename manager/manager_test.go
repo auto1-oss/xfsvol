@@ -7,10 +7,10 @@ import (
 	"path"
 	"testing"
 
-	"github.com/cirocosta/xfsvol/manager"
+	"github.com/auto1-oss/xfsvol/manager"
 	"github.com/stretchr/testify/assert"
 
-	utils "github.com/cirocosta/xfsvol/test_utils"
+	utils "github.com/auto1-oss/xfsvol/test_utils"
 )
 
 const (

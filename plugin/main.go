@@ -19,7 +19,7 @@ type config struct {
 }
 
 var (
-	version string = "v1.0.2"
+	version string = "1.0.4"
 	args           = &config{
 		HostMountpoint: "/mnt/xfs/volumes",
 		DefaultSize:    "512M",

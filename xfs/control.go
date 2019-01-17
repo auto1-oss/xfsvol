@@ -98,7 +98,7 @@ func NewControl(cfg ControlConfig) (c Control, err error) {
 		}
 	}
 
-	log.Printf("base-path: %s, last-project-id: %s, new control created", cfg.BasePath, c.lastProjectId)
+	log.Printf("base-path: %v, last-project-id: %v, new control created", cfg.BasePath, c.lastProjectId)
 
 	return
 }
@@ -137,7 +137,7 @@ func (c *Control) GetQuota(targetPath string) (q *Quota, err error) {
 // SetQuota assigns a unique project id to a directory and then set the
 // quota for that projectId.
 func (c *Control) SetQuota(targetPath string, quota Quota) (err error) {
-	log.Printf("cache: %s will set quota", c.projectIdCache)
+	log.Printf("cache: %v will set quota", c.projectIdCache)
 
 	projectId, ok := c.projectIdCache[targetPath]
 	if !ok {
@@ -153,9 +153,9 @@ func (c *Control) SetQuota(targetPath string, quota Quota) (err error) {
 		c.projectIdCache[targetPath] = projectId
 		c.lastProjectId = projectId
 
-		log.Printf("project-id: %s setting new project id", projectId)
+		log.Printf("project-id: %v setting new project id", projectId)
 	}
-	log.Printf("project-id: %s, last-project-id: %s, target-path: %s, quota-size: %s, quota-inode: %s setting quota", projectId, c.lastProjectId, targetPath, quota.Size, quota.INode)
+	log.Printf("project-id: %v, last-project-id: %v, target-path: %v, quota-size: %v, quota-inode: %v setting quota", projectId, c.lastProjectId, targetPath, quota.Size, quota.INode)
 
 	err = SetProjectQuota(c.backingFsBlockDev, projectId, &quota)
 	if err != nil {

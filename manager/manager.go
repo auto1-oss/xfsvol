@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 	"regexp"
 
-	"github.com/cirocosta/xfsvol/xfs"
+	"github.com/auto1-oss/xfsvol/xfs"
 	"github.com/pkg/errors"
 )
 

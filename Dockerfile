@@ -1,4 +1,4 @@
-FROM golang as builder
+FROM golang:1.11 as builder
 
 RUN set -ex && \
         apt update -y && \
@@ -7,15 +7,15 @@ RUN set -ex && \
                 build-essential \
                 xfslibs-dev
 
-ADD ./ /go/src/github.com/cirocosta/xfsvol/
+ADD ./ /go/src/github.com/auto1-oss/xfsvol/
 
-WORKDIR /go/src/github.com/cirocosta/xfsvol
+WORKDIR /go/src/github.com/auto1-oss/xfsvol
 
 RUN set -ex && \
         cd ./plugin && \
         go build \
                 -tags netgo -v -a \
-                -ldflags "-X main.version=$(cat ./VERSION) -extldflags \"-static\"" && \
+                -ldflags "-X main.version=$(cat ../VERSION) -extldflags \"-static\"" && \
         mv ./plugin /usr/bin/xfsvol
 
 

@@ -4,7 +4,7 @@ import (
 	"log"
 	"sync"
 
-	"github.com/cirocosta/xfsvol/manager"
+	"github.com/auto1-oss/xfsvol/manager"
 	"github.com/pkg/errors"
 
 	v "github.com/docker/go-plugins-helpers/volume"
@@ -107,7 +107,7 @@ func (d Driver) List() (resp *v.ListResponse, err error) {
 		}
 	}
 
-	log.Printf("number-of-volumes %s", len(vols))
+	log.Printf("number-of-volumes %v", len(vols))
 	return
 }
 

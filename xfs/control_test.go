@@ -6,10 +6,10 @@ import (
 	"path"
 	"testing"
 
-	"github.com/cirocosta/xfsvol/xfs"
+	"github.com/auto1-oss/xfsvol/xfs"
 	"github.com/stretchr/testify/assert"
 
-	utils "github.com/cirocosta/xfsvol/test_utils"
+	utils "github.com/auto1-oss/xfsvol/test_utils"
 )
 
 const xfsMount = "/mnt/xfs/tmp"
