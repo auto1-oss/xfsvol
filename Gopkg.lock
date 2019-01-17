@@ -44,7 +44,7 @@
     "sdk",
     "volume"
   ]
-  revision = "61cb8e2334204460162c8bd2417cd43cb71da66f"
+  revision = "1e6269c305b8c75cfda1c8aa91349c38d7335814"
 
 [[projects]]
   name = "github.com/docker/go-units"
@@ -63,16 +63,6 @@
   packages = ["difflib"]
   revision = "792786c7400a136282c1664665ae0a8db921c6c2"
   version = "v1.0.0"
-
-[[projects]]
-  name = "github.com/rs/zerolog"
-  packages = [
-    ".",
-    "internal/cbor",
-    "internal/json"
-  ]
-  revision = "77db4b4f350e31be66a57c332acb7721cf9ff9bb"
-  version = "v1.8.0"
 
 [[projects]]
   name = "github.com/stretchr/testify"

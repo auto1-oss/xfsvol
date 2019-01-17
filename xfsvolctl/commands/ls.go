@@ -7,7 +7,6 @@ import (
 
 	"github.com/cirocosta/xfsvol/manager"
 	"github.com/pkg/errors"
-	"github.com/rs/zerolog"
 	"gopkg.in/urfave/cli.v1"
 )
 
@@ -42,23 +41,14 @@ var Ls = cli.Command{
 			Name:  "root, r",
 			Usage: "Root of the volume listing",
 		},
-		cli.BoolFlag{
-			Name:  "debug",
-			Usage: "Whether debug logs should be displayed",
-		},
 	},
 	Action: lsAction,
 }
 
 func lsAction(c *cli.Context) (err error) {
 	var (
-		root  = c.String("root")
-		debug = c.Bool("debug")
+		root = c.String("root")
 	)
-
-	if debug {
-		zerolog.SetGlobalLevel(zerolog.DebugLevel)
-	}
 
 	if root == "" {
 		cli.ShowCommandHelp(c, "ls")

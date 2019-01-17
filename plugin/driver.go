@@ -1,13 +1,11 @@
 package main
 
 import (
-	"os"
+	"log"
 	"sync"
 
 	"github.com/cirocosta/xfsvol/manager"
 	"github.com/pkg/errors"
-	"github.com/rs/zerolog"
-	"github.com/ventu-io/go-shortid"
 
 	v "github.com/docker/go-plugins-helpers/volume"
 )
@@ -19,7 +17,6 @@ type DriverConfig struct {
 
 type Driver struct {
 	defaultSize string
-	logger      zerolog.Logger
 	manager     *manager.Manager
 	sync.Mutex
 }
@@ -45,28 +42,18 @@ func NewDriver(cfg DriverConfig) (d Driver, err error) {
 		return
 	}
 
-	d.logger = zerolog.New(os.Stdout).With().Str("from", "driver").Logger()
 	d.defaultSize = cfg.DefaultSize
-	d.logger.Info().Msg("driver initiated")
+	log.Println("driver initiated")
 	d.manager = &m
 
 	return
 }
 
 func (d Driver) Create(req *v.CreateRequest) (err error) {
-	var logger = d.logger.With().
-		Str("log-id", shortid.MustGenerate()).
-		Str("method", "create").
-		Str("name", req.Name).
-		Str("opts-size", req.Options["size"]).
-		Str("opts-inode", req.Options["inode"]).
-		Logger()
 
 	size, present := req.Options["size"]
 	if !present {
-		logger.Debug().
-			Str("default", d.defaultSize).
-			Msg("no size opt found, using default")
+		log.Printf("%s no size opt found, using default", req.Name)
 		size = d.defaultSize
 	}
 
@@ -81,8 +68,7 @@ func (d Driver) Create(req *v.CreateRequest) (err error) {
 	d.Lock()
 	defer d.Unlock()
 
-	logger.Debug().
-		Msg("starting creation")
+	log.Printf("%s starting creation", req.Name)
 
 	absHostPath, err := d.manager.Create(manager.Volume{
 		Name: req.Name,
@@ -95,23 +81,16 @@ func (d Driver) Create(req *v.CreateRequest) (err error) {
 		return
 	}
 
-	logger.Debug().
-		Str("abs-host-path", absHostPath).
-		Msg("finished creating volume")
+	log.Printf("abs-host-path: %s finished creating volume", absHostPath)
 	return
 }
 
 func (d Driver) List() (resp *v.ListResponse, err error) {
-	var logger = d.logger.With().
-		Str("log-id", shortid.MustGenerate()).
-		Str("method", "list").
-		Logger()
 
 	d.Lock()
 	defer d.Unlock()
 
-	logger.Debug().
-		Msg("starting volume listing")
+	log.Println("starting volume listing")
 
 	vols, err := d.manager.List()
 	if err != nil {
@@ -128,24 +107,14 @@ func (d Driver) List() (resp *v.ListResponse, err error) {
 		}
 	}
 
-	logger.Debug().
-		Int("number-of-volumes", len(vols)).
-		Msg("finished listing volumes")
+	log.Printf("number-of-volumes %s", len(vols))
 	return
 }
 
 func (d Driver) Get(req *v.GetRequest) (resp *v.GetResponse, err error) {
-	var logger = d.logger.With().
-		Str("log-id", shortid.MustGenerate()).
-		Str("method", "get").
-		Str("name", req.Name).
-		Logger()
 
 	d.Lock()
 	defer d.Unlock()
-
-	logger.Debug().
-		Msg("starting volume retrieval")
 
 	vol, found, err := d.manager.Get(req.Name)
 	if err != nil {
@@ -166,24 +135,14 @@ func (d Driver) Get(req *v.GetRequest) (resp *v.GetResponse, err error) {
 		Mountpoint: vol.Path,
 	}
 
-	logger.Debug().
-		Str("mountpoint", vol.Path).
-		Msg("finished retrieving volume")
+	log.Printf("finished retrieving volume %s", req.Name)
 	return
 }
 
 func (d Driver) Remove(req *v.RemoveRequest) (err error) {
-	var logger = d.logger.With().
-		Str("log-id", shortid.MustGenerate()).
-		Str("method", "remove").
-		Str("name", req.Name).
-		Logger()
 
 	d.Lock()
 	defer d.Unlock()
-
-	logger.Debug().
-		Msg("starting removal")
 
 	err = d.manager.Delete(req.Name)
 	if err != nil {
@@ -192,24 +151,14 @@ func (d Driver) Remove(req *v.RemoveRequest) (err error) {
 			req.Name)
 		return
 	}
-
-	logger.Debug().
-		Msg("finished removing volume")
+	log.Printf("volume %s removed", req.Name)
 	return
 }
 
 func (d Driver) Path(req *v.PathRequest) (resp *v.PathResponse, err error) {
-	var logger = d.logger.With().
-		Str("log-id", shortid.MustGenerate()).
-		Str("method", "path").
-		Str("name", req.Name).
-		Logger()
 
 	d.Lock()
 	defer d.Unlock()
-
-	logger.Debug().
-		Msg("starting path retrieval")
 
 	vol, found, err := d.manager.Get(req.Name)
 	if err != nil {
@@ -223,10 +172,7 @@ func (d Driver) Path(req *v.PathRequest) (resp *v.PathResponse, err error) {
 		err = errors.Errorf("volume %s not found", req.Name)
 		return
 	}
-
-	logger.Debug().
-		Str("path", vol.Path).
-		Msg("finished retrieving volume path")
+	log.Printf("path %s retrieved for volume %s", vol.Path, req.Name)
 
 	resp = new(v.PathResponse)
 	resp.Mountpoint = vol.Path
@@ -234,18 +180,9 @@ func (d Driver) Path(req *v.PathRequest) (resp *v.PathResponse, err error) {
 }
 
 func (d Driver) Mount(req *v.MountRequest) (resp *v.MountResponse, err error) {
-	var logger = d.logger.With().
-		Str("log-id", shortid.MustGenerate()).
-		Str("method", "mount").
-		Str("name", req.Name).
-		Str("id", req.ID).
-		Logger()
 
 	d.Lock()
 	defer d.Unlock()
-
-	logger.Debug().
-		Msg("starting mount")
 
 	vol, found, err := d.manager.Get(req.Name)
 	if err != nil {
@@ -260,9 +197,7 @@ func (d Driver) Mount(req *v.MountRequest) (resp *v.MountResponse, err error) {
 		return
 	}
 
-	logger.Debug().
-		Str("mountpoint", vol.Path).
-		Msg("finished mounting volume")
+	log.Printf("finished mounting volume %s", req.Name)
 
 	resp = new(v.MountResponse)
 	resp.Mountpoint = vol.Path
@@ -270,18 +205,11 @@ func (d Driver) Mount(req *v.MountRequest) (resp *v.MountResponse, err error) {
 }
 
 func (d Driver) Unmount(req *v.UnmountRequest) (err error) {
-	var logger = d.logger.With().
-		Str("log-id", shortid.MustGenerate()).
-		Str("method", "mount").
-		Str("name", req.Name).
-		Str("id", req.ID).
-		Logger()
 
 	d.Lock()
 	defer d.Unlock()
 
-	logger.Debug().Msg("started unmounting")
-	logger.Debug().Msg("finished unmounting")
+	log.Printf("finished unmounting %s", req.Name)
 
 	return
 }

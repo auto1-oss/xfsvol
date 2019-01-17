@@ -3,7 +3,6 @@ package commands
 import (
 	"github.com/cirocosta/xfsvol/manager"
 	"github.com/pkg/errors"
-	"github.com/rs/zerolog"
 	"gopkg.in/urfave/cli.v1"
 )
 
@@ -55,10 +54,6 @@ var Create = cli.Command{
 			Name:  "root, r",
 			Usage: "Root of the volume creation (under an xfs filesystem)",
 		},
-		cli.BoolFlag{
-			Name:  "debug",
-			Usage: "Whether debug logs should be displayed",
-		},
 	},
 	Action: createAction,
 }
@@ -69,14 +64,9 @@ func createAction(c *cli.Context) (err error) {
 		size  = c.String("size")
 		root  = c.String("root")
 		inode = c.Uint64("inode")
-		debug = c.Bool("debug")
 
 		sizeInBytes uint64
 	)
-
-	if debug {
-		zerolog.SetGlobalLevel(zerolog.DebugLevel)
-	}
 
 	if name == "" || size == "" || root == "" {
 		cli.ShowCommandHelp(c, "create")

@@ -6,11 +6,11 @@ package xfs
 
 import (
 	"io/ioutil"
+	"log"
 	"os"
 	"path/filepath"
 
 	"github.com/pkg/errors"
-	"github.com/rs/zerolog"
 )
 
 // blockDeviceName corresponds to the name of the
@@ -21,8 +21,6 @@ const blockDeviceName = "__control-device"
 // Control gives the context to be used by storage driver
 // who wants to apply project quotas to container dirs.
 type Control struct {
-	logger zerolog.Logger
-
 	// backingFsBlockDev is the absolute path to the
 	// block device that keeps track of quotas under
 	// a given basePath (root of the project quota tree).
@@ -85,9 +83,6 @@ func NewControl(cfg ControlConfig) (c Control, err error) {
 	}
 
 	c.backingFsBlockDev = filepath.Join(cfg.BasePath, blockDeviceName)
-	c.logger = zerolog.New(os.Stdout).With().
-		Str("from", "control").
-		Logger()
 
 	c.projectIdCache, err = GeneratePathToProjectIdMap(cfg.BasePath)
 	if err != nil {
@@ -103,10 +98,7 @@ func NewControl(cfg ControlConfig) (c Control, err error) {
 		}
 	}
 
-	c.logger.Debug().
-		Str("base-path", cfg.BasePath).
-		Uint32("last-project-id", c.lastProjectId).
-		Msg("new control created")
+	log.Printf("base-path: %s, last-project-id: %s, new control created", cfg.BasePath, c.lastProjectId)
 
 	return
 }
@@ -145,7 +137,7 @@ func (c *Control) GetQuota(targetPath string) (q *Quota, err error) {
 // SetQuota assigns a unique project id to a directory and then set the
 // quota for that projectId.
 func (c *Control) SetQuota(targetPath string, quota Quota) (err error) {
-	c.logger.Debug().Interface("cache", c.projectIdCache).Msg("will set quota")
+	log.Printf("cache: %s will set quota", c.projectIdCache)
 
 	projectId, ok := c.projectIdCache[targetPath]
 	if !ok {
@@ -161,16 +153,9 @@ func (c *Control) SetQuota(targetPath string, quota Quota) (err error) {
 		c.projectIdCache[targetPath] = projectId
 		c.lastProjectId = projectId
 
-		c.logger.Debug().Uint32("project-id", projectId).Msg("setting new project id")
+		log.Printf("project-id: %s setting new project id", projectId)
 	}
-
-	c.logger.Debug().
-		Uint32("project-id", projectId).
-		Uint32("last-project-id", c.lastProjectId).
-		Str("target-path", targetPath).
-		Uint64("quota-size", quota.Size).
-		Uint64("quota-inode", quota.INode).
-		Msg("setting quota")
+	log.Printf("project-id: %s, last-project-id: %s, target-path: %s, quota-size: %s, quota-inode: %s setting quota", projectId, c.lastProjectId, targetPath, quota.Size, quota.INode)
 
 	err = SetProjectQuota(c.backingFsBlockDev, projectId, &quota)
 	if err != nil {

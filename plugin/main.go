@@ -1,10 +1,9 @@
 package main
 
 import (
-	"os"
+	"log"
 
 	"github.com/alexflint/go-arg"
-	"github.com/rs/zerolog"
 
 	v "github.com/docker/go-plugins-helpers/volume"
 )
@@ -20,8 +19,7 @@ type config struct {
 }
 
 var (
-	version string = "master-dev"
-	logger         = zerolog.New(os.Stdout)
+	version string = "v1.0.2"
 	args           = &config{
 		HostMountpoint: "/mnt/xfs/volumes",
 		DefaultSize:    "512M",
@@ -32,35 +30,20 @@ var (
 func main() {
 	arg.MustParse(args)
 
-	logger.Info().
-		Str("version", version).
-		Str("socket-address", socketAddress).
-		Interface("args", args).
-		Msg("initializing plugin")
-
-	if args.Debug {
-		zerolog.SetGlobalLevel(zerolog.DebugLevel)
-	}
+	log.Printf("version: %s, socket-address: %s, initializing plugin", version, socketAddress)
 
 	d, err := NewDriver(DriverConfig{
 		HostMountpoint: args.HostMountpoint,
 		DefaultSize:    args.DefaultSize,
 	})
 	if err != nil {
-		logger.Fatal().
-			Err(err).
-			Msg("failed to initialize XFS volume driver")
-		os.Exit(1)
+		log.Fatalf("%s failed to initialize XFS volume driver", err)
 	}
 
 	h := v.NewHandler(d)
 	err = h.ServeUnix(socketAddress, 0)
 	if err != nil {
-		logger.Fatal().
-			Err(err).
-			Str("socket-address", socketAddress).
-			Msg("failed to server volume plugin api over unix socket")
-		os.Exit(1)
+		log.Fatalf("%s failed to server volume plugin api over unix socket %s", err, socketAddress)
 	}
 
 	return
